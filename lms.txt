@@ -1,0 +1,109 @@
+
+
+1. 
+book_master
+
+  book_code PK
+  book_title 
+  book_author
+  book_issuable (1- issuable  0-not issuable)
+ ----------------------------------------------------------------------------------------------------------- 
+  create table book_master(
+  book_code number(6) CONSTRAINT book_code_pk PRIMARY KEY,
+  book_title varchar(20) NOT NULL,
+  book_author varchar(20) NOT NULL,
+  book_issuable number(1) default 1,
+  CONSTRAINT check_issuable check (book_issuable in(1,0))  
+  );
+------------------------------------------------------------------------------------------------------------  
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1001,'Jyoti Punj','Narendra Modi');
+  
+  ALTER table book_master MODIFY book_title varchar2(40);
+  
+  INSERT INTO book_master(book_code,book_title,book_author,book_issuable) VALUES(1002,'Muze Sach Bolna Pasand He','Shaili Admont',0);
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1003,'The Leader Who Had No Title','Robin Sharma');
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1004,'Gupt Dhan','Premchand');
+  
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1005,'Raj Bhasha','Nishant Jain');
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1006,'SAMIDHA','INDU KASHYAP');
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1007,'UnChuhe Sapne','Subodh Uniyal');
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1008,'Killig Hamingway','Brian D. Meeks');
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1009,'Shabdanchal','Naman Khandewal');
+  INSERT INTO book_master(book_code,book_title,book_author) VALUES(1010,'Janta Store','Navin Choudhary');
+
+
+	  
+
+
+
+  
+**************************************************************************************************************************************
+
+
+2. member_master
+  
+  member_code PK
+  name
+  member_type (student/faculty)
+  issue_book_total
+  issue_book_limit
+
+---------------------------------------------------------------------------
+create table member_master(
+	member_code number GENERATED ALWAYS AS IDENTITY,
+	member_name varchar(30),
+	member_type varchar(20),
+	issue_book_total number,
+	issue_book_limit number,
+	CONSTRAINTS member_master_pk PRIMARY KEY(member_code),
+	CONSTRAINT  member_type_check CHECK(member_type IN('student','faculty'))
+);
+---------------------------------------------------------------------------------------
+INSERT INTO member_master(member_name,member_type,issue_book_total,issue_book_limit) VALUES('SOHAN','student',0,3);
+
+INSERT INTO member_master(member_name,member_type,issue_book_total,issue_book_limit) VALUES('MAYANK','student',1,3);
+
+INSERT INTO member_master(member_name,member_type,issue_book_total,issue_book_limit) VALUES('VIVEL GOHIL','faculty',3,25);
+
+INSERT INTO member_master(member_name,member_type,issue_book_total,issue_book_limit) VALUES('PAWAN MALANI','faculty',2,25);
+
+INSERT INTO member_master(member_name,member_type,issue_book_total,issue_book_limit) VALUES('Akashay','student',1,3);
+
+**************************************************************************************************************************************
+
+3. book_issue_record
+  
+   serial_no PK    (system generated)
+   date_of_issue  (default today's date)
+   due_date   ( +10 days for student and +3 month for faculty)
+   member_code Fk member_master
+   book_code FK book_master
+   
+   ----------------------------------------------------------------------------------
+   CREATE TABLE book_issue_record (
+	serial_no varchar2(20) CONSTRAINT serial_no_pk PRIMARY KEY,
+	date_of_issue DATE ,
+	due_date DATE,
+	member_code number ,
+	book_code  number,
+	CONSTRAINT member_code_fk FOREIGN KEY(member_code) references member_master,
+	CONSTRAINT book_code_fk FOREIGN KEY(book_code) references book_master
+	);
+  ------------------------------------------------------------------
+  
+  INSERT INTO book_issue_record VALUES('S1001',TO_DATE(sysdate,'dd/mm/yyyy'),TO_DATE(sysdate+10,'dd/mm/yyyy'),1,1003);
+  INSERT INTO book_issue_record VALUES('S1002',TO_DATE(sysdate,'dd/mm/yyyy'),TO_DATE(sysdate+25,'dd/mm/yyyy'),3,1001);
+  INSERT INTO book_issue_record VALUES('S1003',TO_DATE(sysdate,'dd/mm/yyyy'),TO_DATE(sysdate+25,'dd/mm/yyyy'),3,1004);
+  
+  INSERT INTO book_issue_record VALUES('S1004',TO_DATE(sysdate,'dd/mm/yyyy'),TO_DATE(sysdate+25,'dd/mm/yyyy'),3,1010);
+  
+
+   
+   
+   
+   
+   
+   
+   
+   
+   
