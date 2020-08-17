@@ -76,14 +76,15 @@ public class NewBookIssueAction extends Action {
 			dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(addForm.getDueDate());
 
 			if (dueDate.compareTo(cal.getTime()) < 0) {
+				System.out.println("INside iffffffffffffffff");
 				errors.add("fillDetailError", new ActionMessage("error.date"));
 				saveErrors(request, errors);
 				return mapping.findForward("getMemberData");
 			} else {
+				System.out.println("INside elseeeeeeee");
 				book = dao.getBook(bookCode);
 				member = dao.getMember(memberCode);
 				if (book != null && member != null) {
-
 					if (book.getBookIssuable() == 0) {
 						errors.add("fillDetailError", new ActionMessage("error.bookNotIssuable"));
 						saveErrors(request, errors);
