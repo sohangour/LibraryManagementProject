@@ -1,4 +1,6 @@
-
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="com.montran.form.AddNewBookForm"%>
+<%@page import="java.time.LocalDate"%>
 <%@page import="java.util.Date"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
@@ -18,19 +20,14 @@ td {
 </style>
 </head>
 <body>
-	<%!String serialNo;%>
-	<%
-		Date date = new Date();
-	serialNo = String.valueOf(date.getTime());
-	%>
-
+	
 	<h3>Issue New Book</h3>
 	<hr>
 	<html:form action="newBookIssue" method="post">
 		<table style="border-collapse: collapse;">
 			<tr>
 				<td><bean:message key="label.name.serialNo" /></td>
-				<td><html:text property="serialNo" value="<%=serialNo%>"
+				<td><html:text property="serialNo" name="addNewBookForm"
 						readonly="true" /></td>
 			</tr>
 			<tr>
@@ -67,7 +64,7 @@ td {
 			</tr>
 			<tr>
 				<td><bean:message key="label.name.duedate" /></td>
-				<td><input type="date" name="dueDate"></td>
+				<td><input type="date" name="dueDate" /></td>
 			</tr>
 			<tr>
 				<td><html:submit property="addBook">Add Book</html:submit></td>

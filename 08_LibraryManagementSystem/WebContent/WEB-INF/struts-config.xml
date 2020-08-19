@@ -26,7 +26,7 @@
 			type="com.montran.action.NewBookIssueAction" name="addNewBookForm"
 			validate="true" input="/issueNewBook.jsp">
 			<forward name="success" path="/getAllList.do" />
-			<forward name="getMemberData" path="/issueNewBook.jsp"></forward>
+			<forward name="retrieveInfo" path="/issueNewBook.jsp"></forward>
 		</action>
 
 

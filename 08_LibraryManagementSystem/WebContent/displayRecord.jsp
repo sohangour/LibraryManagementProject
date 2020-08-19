@@ -63,7 +63,7 @@ th, td {
 	%>
 	<br>
 	<br>
-	<a href="issueNewBook.jsp">Issue New Book</a> &nbsp;
+	<a href="newBookIssue.do">Issue New Book</a> &nbsp;
 	<a href="updateBook.jsp">Update Book</a> &nbsp;
 	<a href="deleteBook.jsp">Delete Book</a> &nbsp;
 

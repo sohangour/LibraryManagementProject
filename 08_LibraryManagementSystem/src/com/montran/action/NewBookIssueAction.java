@@ -33,6 +33,7 @@ public class NewBookIssueAction extends Action {
 	BookIssueRecord record;
 	DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 	Calendar cal = Calendar.getInstance();
+	Date date = new Date();
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -42,9 +43,10 @@ public class NewBookIssueAction extends Action {
 		Book book = null;
 		Member member = null;
 		ActionErrors errors = new ActionErrors();
-		bookCode = addForm.getBookCode();
-		memberCode = addForm.getMemberCode();
-
+		if (addForm != null) {
+			bookCode = addForm.getBookCode();
+			memberCode = addForm.getMemberCode();
+		}
 		if (request.getParameter("getMemberData") != null) {
 			member = dao.getMember(memberCode);
 			if (member == null) {
@@ -54,10 +56,16 @@ public class NewBookIssueAction extends Action {
 				addForm.setMemberCode(member.getMemberCode());
 				addForm.setMemberName(member.getMemberName());
 
-			}
-			return mapping.findForward("getMemberData");
-		} else if (request.getParameter("getBookData") != null) {
+//				if (member.getMemberType().equals("student")) {
+//					String dat = new SimpleDateFormat("dd-MM-yyyy").format(date);
+//					System.out.println(dat);
+//					addForm.setDueDate(dat);
+//					System.out.println("get" + addForm.getDueDate());
+//				}
 
+			}
+			return mapping.findForward("retrieveInfo");
+		} else if (request.getParameter("getBookData") != null) {
 			book = dao.getBook(bookCode);
 			if (book == null) {
 				errors.add("bookCodeError", new ActionMessage("error.bookCode"));
@@ -67,35 +75,37 @@ public class NewBookIssueAction extends Action {
 				addForm.setBookTitle(book.getBookTitle());
 				addForm.setBookAuthor(book.getBookAuthor());
 			}
-			return mapping.findForward("getMemberData");
+			return mapping.findForward("retrieveInfo");
 		}
 
-		else {
+		else if (request.getParameter("addBook") != null) {
 
 			serialNo = addForm.getSerialNo();
 			dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(addForm.getDueDate());
 
-			if (dueDate.compareTo(cal.getTime()) < 0) {
-				System.out.println("INside iffffffffffffffff");
-				errors.add("fillDetailError", new ActionMessage("error.date"));
-				saveErrors(request, errors);
-				return mapping.findForward("getMemberData");
-			} else {
-				System.out.println("INside elseeeeeeee");
-				book = dao.getBook(bookCode);
-				member = dao.getMember(memberCode);
-				if (book != null && member != null) {
-					if (book.getBookIssuable() == 0) {
-						errors.add("fillDetailError", new ActionMessage("error.bookNotIssuable"));
+			book = dao.getBook(bookCode);
+			member = dao.getMember(memberCode);
+			if (book != null && member != null) {
+				if (book.getBookIssuable() == 0) {
+					errors.add("fillDetailError", new ActionMessage("error.bookNotIssuable"));
+					saveErrors(request, errors);
+					return mapping.findForward("retrieveInfo");
+				} else {
+					int result = dao.bookAlreadyIssue(bookCode);
+					if (result > 0) {
+						errors.add("fillDetailError", new ActionMessage("error.alreayIssued"));
 						saveErrors(request, errors);
-						return mapping.findForward("getMemberData");
+						return mapping.findForward("retrieveInfo");
 					} else {
-						int result = dao.bookAlreadyIssue(bookCode);
-						if (result > 0) {
-							errors.add("fillDetailError", new ActionMessage("error.alreayIssued"));
+
+						if (dueDate.compareTo(cal.getTime()) < 0) {
+							errors.add("fillDetailError", new ActionMessage("error.date"));
 							saveErrors(request, errors);
-							return mapping.findForward("getMemberData");
-						} else {
+							return mapping.findForward("retrieveInfo");
+						} else
+
+						{
+
 							if (member.getTotalIssuedBook() < member.getLimitIssuedBook()) {
 								dao.updateMemberDetail(memberCode);
 								BookIssueRecord bookIssueRecord = new BookIssueRecord(serialNo, dueDate, member, book);
@@ -105,21 +115,22 @@ public class NewBookIssueAction extends Action {
 							} else {
 								errors.add("fillDetailError", new ActionMessage("error.limitExceed"));
 								saveErrors(request, errors);
-								return mapping.findForward("getMemberData");
+								return mapping.findForward("retrieveInfo");
 							}
-
 						}
 					}
-
-				} else {
-					errors.add("fillDetailError", new ActionMessage("error.fillInfo"));
-					saveErrors(request, errors);
-
-					return mapping.findForward("getMemberData");
 				}
 
+			} else {
+				errors.add("fillDetailError", new ActionMessage("error.fillInfo"));
+				saveErrors(request, errors);
+				return mapping.findForward("retrieveInfo");
 			}
-		}
 
+		}
+		Date date = new Date();
+		String serial = String.valueOf(date.getTime());
+		addForm.setSerialNo(serial);
+		return mapping.findForward("retrieveInfo");
 	}
 }
