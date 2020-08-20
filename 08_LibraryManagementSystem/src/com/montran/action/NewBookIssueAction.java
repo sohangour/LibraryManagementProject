@@ -32,8 +32,8 @@ public class NewBookIssueAction extends Action {
 	Member member;
 	BookIssueRecord record;
 	DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-	Calendar cal = Calendar.getInstance();
-	Date date = new Date();
+	DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+	Calendar calendar = Calendar.getInstance();
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -55,14 +55,6 @@ public class NewBookIssueAction extends Action {
 			} else {
 				addForm.setMemberCode(member.getMemberCode());
 				addForm.setMemberName(member.getMemberName());
-
-//				if (member.getMemberType().equals("student")) {
-//					String dat = new SimpleDateFormat("dd-MM-yyyy").format(date);
-//					System.out.println(dat);
-//					addForm.setDueDate(dat);
-//					System.out.println("get" + addForm.getDueDate());
-//				}
-
 			}
 			return mapping.findForward("retrieveInfo");
 		} else if (request.getParameter("getBookData") != null) {
@@ -74,17 +66,19 @@ public class NewBookIssueAction extends Action {
 				addForm.setBookCode(book.getBookCode());
 				addForm.setBookTitle(book.getBookTitle());
 				addForm.setBookAuthor(book.getBookAuthor());
+				member = dao.getMember(addForm.getMemberCode());
+
+				setDate(member, request);
+
 			}
 			return mapping.findForward("retrieveInfo");
 		}
 
 		else if (request.getParameter("addBook") != null) {
-
 			serialNo = addForm.getSerialNo();
-			dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(addForm.getDueDate());
-
 			book = dao.getBook(bookCode);
 			member = dao.getMember(memberCode);
+			dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(addForm.getDueDate());
 			if (book != null && member != null) {
 				if (book.getBookIssuable() == 0) {
 					errors.add("fillDetailError", new ActionMessage("error.bookNotIssuable"));
@@ -98,14 +92,13 @@ public class NewBookIssueAction extends Action {
 						return mapping.findForward("retrieveInfo");
 					} else {
 
-						if (dueDate.compareTo(cal.getTime()) < 0) {
+						if (dueDate.compareTo(calendar.getTime()) < 0) {
 							errors.add("fillDetailError", new ActionMessage("error.date"));
 							saveErrors(request, errors);
 							return mapping.findForward("retrieveInfo");
 						} else
 
 						{
-
 							if (member.getTotalIssuedBook() < member.getLimitIssuedBook()) {
 								dao.updateMemberDetail(memberCode);
 								BookIssueRecord bookIssueRecord = new BookIssueRecord(serialNo, dueDate, member, book);
@@ -132,5 +125,20 @@ public class NewBookIssueAction extends Action {
 		String serial = String.valueOf(date.getTime());
 		addForm.setSerialNo(serial);
 		return mapping.findForward("retrieveInfo");
+	}
+
+	private void setDate(Member member, HttpServletRequest request) {
+		Calendar cal = Calendar.getInstance();
+		String dat = "";
+		if (member.getMemberType().equals("student")) {
+			cal.add(Calendar.DAY_OF_MONTH, 8);
+			dat = format1.format(cal.getTime());
+			request.setAttribute("dueDate", dat);
+		} else {
+			cal.add(Calendar.DAY_OF_MONTH, 90);
+			dat = format1.format(cal.getTime());
+			request.setAttribute("dueDate", dat);
+		}
+
 	}
 }

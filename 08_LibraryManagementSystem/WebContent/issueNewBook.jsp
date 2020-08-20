@@ -1,3 +1,4 @@
+<%@page import="java.util.Calendar"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.montran.form.AddNewBookForm"%>
 <%@page import="java.time.LocalDate"%>
@@ -20,7 +21,13 @@ td {
 </style>
 </head>
 <body>
-	
+	<%
+		String date = "";
+
+	if (request.getAttribute("dueDate") != null) {
+		date = (request.getAttribute("dueDate")).toString();
+	}
+	%>
 	<h3>Issue New Book</h3>
 	<hr>
 	<html:form action="newBookIssue" method="post">
@@ -64,7 +71,8 @@ td {
 			</tr>
 			<tr>
 				<td><bean:message key="label.name.duedate" /></td>
-				<td><input type="date" name="dueDate" /></td>
+				<td><input type="date" name="dueDate" placeholder="dd-mm-yyyy"
+					value="<%=date%>" /></td>
 			</tr>
 			<tr>
 				<td><html:submit property="addBook">Add Book</html:submit></td>
